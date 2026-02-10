@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { RefreshCw, CheckCircle, AlertCircle, Settings } from 'lucide-react';
+import { RefreshCw, CheckCircle, AlertCircle, Settings, Download } from 'lucide-react';
 import ImageUploader from './components/ImageUploader';
 import APIKeyModal from './components/APIKeyModal';
+import ExportModal from './components/ExportModal';
 import { compareImages } from './utils/gemini';
 import { drawBoxes, clearHeatmap } from './utils/drawHeatmap';
 import { exportDiagnostics } from './utils/diagnostics';
@@ -15,6 +16,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
   const [useOpenCV] = useState(localStorage.getItem('use_opencv') === 'true');
   const image2ContainerRef = useRef(null);
@@ -242,6 +244,16 @@ function App() {
                       {t('heatmapHint')}
                     </p>
                   </div>
+
+                  {/* Export Button */}
+                  <button
+                    onClick={() => setShowExport(true)}
+                    className="w-full mt-4 py-3 px-4 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 flex items-center justify-center gap-2 transition-colors"
+                    aria-label="Export results"
+                  >
+                    <Download size={18} />
+                    Export Results
+                  </button>
                 </div>
               )}
               
@@ -289,6 +301,14 @@ function App() {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         onSave={setApiKey}
+      />
+
+      <ExportModal
+        isOpen={showExport}
+        onClose={() => setShowExport(false)}
+        result={result}
+        image1={image1}
+        image2={image2}
       />
     </div>
   );
