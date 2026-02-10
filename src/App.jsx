@@ -6,6 +6,7 @@ import { compareImages } from './utils/gemini';
 import { drawBoxes, clearHeatmap } from './utils/drawHeatmap';
 import { exportDiagnostics } from './utils/diagnostics';
 import { processImageForAI, isOpenCVAvailable } from './utils/imageProcessing';
+import { t } from './utils/i18n';
 
 function App() {
   const [image1, setImage1] = useState(null);
@@ -21,11 +22,11 @@ function App() {
 
   const handleCompare = async () => {
     if (!image1 || !image2) {
-      setError("Please take both photos first.");
+      setError(t('errorBothPhotos'));
       return;
     }
     if (!apiKey) {
-      setError("Please set your API Key in settings.");
+      setError(t('errorApiKey'));
       setShowSettings(true);
       return;
     }
@@ -79,7 +80,7 @@ function App() {
       // This prevents race conditions and ensures image is loaded first
     } catch (err) {
       console.error('[App] Error during comparison:', err);
-      setError(err.message);
+      setError(err.message || t('errorComparisonFailed'));
     } finally {
       setLoading(false);
     }
@@ -127,11 +128,12 @@ function App() {
       <header className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
           <CheckCircle className="text-blue-500" />
-          Product Checker
+          {t('appTitle')}
         </h1>
         <button
           onClick={() => setShowSettings(true)}
           className="p-2 bg-white rounded-full shadow-sm text-gray-600 hover:text-blue-600 transition-colors"
+          aria-label={t('settings')}
         >
           <Settings size={24} />
         </button>
@@ -143,20 +145,20 @@ function App() {
           <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl flex items-start gap-3 cursor-pointer" onClick={() => setShowSettings(true)}>
             <AlertCircle className="text-yellow-600 shrink-0 mt-0.5" size={20} />
             <div>
-              <p className="text-sm text-yellow-800 font-medium">API Key Needed</p>
-              <p className="text-xs text-yellow-600">Tap to configure Google Gemini API.</p>
+              <p className="text-sm text-yellow-800 font-medium">{t('apiKeyNeeded')}</p>
+              <p className="text-xs text-yellow-600">{t('apiKeyTapConfig')}</p>
             </div>
           </div>
         )}
 
         <div className="grid grid-cols-2 gap-4">
           <ImageUploader
-            label="1. Before (Stock)"
+            label={t('uploadBefore')}
             selectedImage={image1}
             onImageSelect={setImage1}
           />
           <ImageUploader
-            label="2. After (Check)"
+            label={t('uploadAfter')}
             selectedImage={image2}
             onImageSelect={setImage2}
           />
@@ -170,15 +172,16 @@ function App() {
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl'
             }`}
+          aria-label={loading ? t('comparing') : t('comparePhotos')}
         >
           {loading ? (
             <>
               <RefreshCw className="animate-spin" />
-              Comparing...
+              {t('comparing')}
             </>
           ) : (
             <>
-              Compare Photos
+              {t('comparePhotos')}
             </>
           )}
         </button>
@@ -189,20 +192,22 @@ function App() {
             <button
               onClick={handleTestDebugHeatmap}
               className="w-full py-2 px-4 rounded-lg text-sm bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200"
+              aria-label="Test heatmap"
             >
-              🧪 Test Heatmap (Debug)
+              {t('testHeatmap')}
             </button>
             <button
               onClick={handleExportDiagnostics}
               className="w-full py-2 px-4 rounded-lg text-sm bg-purple-100 text-purple-800 border border-purple-300 hover:bg-purple-200"
+              aria-label="Export diagnostics"
             >
-              📊 Export Diagnostics
+              {t('exportDiagnostics')}
             </button>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl" role="alert">
             {error}
           </div>
         )}
@@ -211,21 +216,21 @@ function App() {
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="bg-green-500 text-white p-3 font-semibold flex items-center gap-2">
               <CheckCircle size={20} />
-              Analysis Result
+              {t('analysisResult')}
             </div>
             <div className="p-4">
               <p className="text-gray-700 font-medium mb-3">{result.summary}</p>
               
               {result.missing && result.missing.length > 0 && (
                 <div className="mb-4">
-                  <h3 className="font-semibold text-gray-800 mb-2">Missing Items ({result.missing.length}):</h3>
+                  <h3 className="font-semibold text-gray-800 mb-2">{t('missingItems')} ({result.missing.length}):</h3>
                   <ul className="space-y-3">
                     {result.missing.map((item, idx) => (
                       <li key={idx} className="text-sm text-gray-700 border-l-4 border-red-500 pl-3 py-2 bg-red-50 rounded">
                         <div className="font-medium">{item.label}</div>
                         {item.box && (
                           <div className="text-xs text-gray-600 mt-1 font-mono">
-                            Box: [{item.box[0]}, {item.box[1]}, {item.box[2]}, {item.box[3]}]
+                            {t('box')}: [{item.box[0]}, {item.box[1]}, {item.box[2]}, {item.box[3]}]
                           </div>
                         )}
                       </li>
@@ -234,7 +239,7 @@ function App() {
                   
                   <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-xs text-blue-700">
-                      🔥 Red zones on the photo show where items are missing (scroll down to see)
+                      {t('heatmapHint')}
                     </p>
                   </div>
                 </div>
@@ -242,7 +247,7 @@ function App() {
               
               {result.missing && result.missing.length === 0 && (
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-700">✓ No missing items detected - shelves are fully stocked!</p>
+                  <p className="text-sm text-green-700">{t('noMissingItems')}</p>
                 </div>
               )}
             </div>
@@ -253,7 +258,7 @@ function App() {
         {result && result.missing && result.missing.length > 0 && (
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="bg-purple-500 text-white p-3 font-semibold">
-              🔥 Heat-map View (Missing Items)
+              {t('heatmapView')}
             </div>
             <div 
               ref={image2ContainerRef}
