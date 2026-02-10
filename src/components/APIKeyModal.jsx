@@ -1,6 +1,8 @@
 import React, { useState, useEffect, startTransition, useCallback } from 'react';
-import { Settings, Save, X, Zap } from 'lucide-react';
+import PropTypes from 'prop-types';
+import { Settings, Save, X, Zap, Globe } from 'lucide-react';
 import { initializeOpenCV, isOpenCVAvailable } from '../utils/imageProcessing';
+import { t, getLanguage, setLanguage, getAvailableLanguages } from '../utils/i18n';
 
 const APIKeyModal = ({ isOpen, onClose, onSave }) => {
     const [key, setKey] = useState('');
@@ -8,6 +10,7 @@ const APIKeyModal = ({ isOpen, onClose, onSave }) => {
     const [cvLoading, setCvLoading] = useState(false);
     const [cvAvailable, setCvAvailable] = useState(isOpenCVAvailable());
     const [cvProgress, setCvProgress] = useState(0);
+    const [currentLang, setCurrentLang] = useState(getLanguage());
 
     useEffect(() => {
         if (isOpen) {
@@ -64,40 +67,84 @@ const APIKeyModal = ({ isOpen, onClose, onSave }) => {
         onClose();
     };
 
+    const handleLanguageChange = (lang) => {
+        setLanguage(lang);
+        setCurrentLang(lang);
+        // Trigger re-render of parent by reloading
+        window.location.reload();
+    };
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl">
+            <div 
+                className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl max-h-[90vh] overflow-y-auto"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="settings-modal-title"
+            >
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <h2 id="settings-modal-title" className="text-xl font-bold text-gray-800 flex items-center gap-2">
                         <Settings size={20} />
-                        Settings
+                        {t('settingsTitle')}
                     </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Close">
                         <X size={20} />
                     </button>
                 </div>
 
+                {/* Language Selector */}
+                <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
+                        <Globe size={18} className="text-blue-500" />
+                        Language / Мова
+                    </label>
+                    <div className="flex gap-2">
+                        {getAvailableLanguages().map(lang => (
+                            <button
+                                key={lang.code}
+                                onClick={() => handleLanguageChange(lang.code)}
+                                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                    currentLang === lang.code
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-500'
+                                }`}
+                            >
+                                {lang.nativeName}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <p className="text-sm text-gray-600 mb-4">
-                    Enter your Gemini API Key to enable image comparison.
+                    {t('enterApiKey')}
                     <br />
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" className="text-blue-500 underline">Get a free key here</a>.
+                    <a 
+                        href="https://aistudio.google.com/app/apikey" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-500 underline"
+                        aria-label="Get a free API key (opens in new tab)"
+                    >
+                        {t('getFreeKey')}
+                    </a>.
                 </p>
 
                 <input
                     type="password"
                     value={key}
                     onChange={(e) => setKey(e.target.value)}
-                    placeholder="AIzaSy..."
+                    placeholder={t('apiKeyPlaceholder')}
                     className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    aria-label="API Key"
                 />
 
                 <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                         <label className="flex items-center gap-2 font-semibold text-gray-700">
                             <Zap size={18} className="text-yellow-500" />
-                            Enhance Image Quality
+                            {t('enhanceQuality')}
                         </label>
                         <button
                             onClick={handleToggleOpenCV}
@@ -107,12 +154,13 @@ const APIKeyModal = ({ isOpen, onClose, onSave }) => {
                                     ? 'bg-green-500 text-white'
                                     : 'bg-gray-300 text-gray-700'
                             } ${cvLoading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg'}`}
+                            aria-label={`OpenCV ${useOpenCV ? 'enabled' : 'disabled'}`}
                         >
-                            {cvLoading ? `Loading... ${cvProgress}%` : useOpenCV ? 'ON' : 'OFF'}
+                            {cvLoading ? `${t('loading')} ${Math.round(cvProgress)}%` : useOpenCV ? t('on') : t('off')}
                         </button>
                     </div>
                     <p className="text-xs text-gray-600">
-                        Use OpenCV.js to enhance image quality before analysis (increases accuracy)
+                        {t('enhanceDescription')}
                     </p>
                     
                     {/* Progress bar while loading */}
@@ -121,18 +169,22 @@ const APIKeyModal = ({ isOpen, onClose, onSave }) => {
                             <div 
                                 className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${cvProgress}%` }}
+                                role="progressbar"
+                                aria-valuenow={cvProgress}
+                                aria-valuemin="0"
+                                aria-valuemax="100"
                             ></div>
                         </div>
                     )}
                     
                     {!cvAvailable && !useOpenCV && (
                         <p className="text-xs text-yellow-600 mt-2">
-                            ⚠️ Click ON to download OpenCV (8 MB)
+                            {t('downloadOpenCV')}
                         </p>
                     )}
                     {cvAvailable && (
                         <p className="text-xs text-green-600 mt-2">
-                            ✓ OpenCV ready
+                            {t('openCVReady')}
                         </p>
                     )}
                 </div>
@@ -140,13 +192,20 @@ const APIKeyModal = ({ isOpen, onClose, onSave }) => {
                 <button
                     onClick={handleSave}
                     className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 flex items-center justify-center gap-2"
+                    aria-label="Save settings"
                 >
                     <Save size={18} />
-                    Save Key
+                    {t('saveKey')}
                 </button>
             </div>
         </div>
     );
+};
+
+APIKeyModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
 };
 
 export default APIKeyModal;

@@ -7,6 +7,12 @@ AI-powered shelf analyzer that detects missing products by comparing two photos.
 - 📸 **Photo comparison** - Upload "before" and "after" shelf photos
 - 🤖 **AI-powered detection** - Uses Google Gemini 2.5 Flash for intelligent analysis
 - 🔥 **Visual heatmap** - Shows exactly where items are missing with red overlays
+- 🌍 **Multi-language** - Support for Ukrainian and English
+- 📊 **Export results** - Export analysis as HTML, JSON, CSV, or TXT
+- 🖼️ **Image optimization** - Automatic compression to reduce API costs
+- ✅ **Validation** - File type and size validation for uploads
+- ♿ **Accessible** - ARIA labels and keyboard navigation
+- 🛡️ **Error boundaries** - Graceful error handling and recovery
 - 💾 **Offline support** - PWA (Progressive Web App) for offline functionality
 - 📱 **Mobile-friendly** - Designed for smartphones and tablets
 - 🎨 **Tailwind CSS** - Beautiful, responsive UI
@@ -35,10 +41,12 @@ npm run preview
 ### First Use
 1. Open the app in your browser (usually http://localhost:5173)
 2. Click the ⚙️ settings icon
-3. Enter your Google Gemini API key
-4. Upload two shelf photos (before and after)
-5. Click "Compare Photos"
-6. View results with red heatmap showing missing items
+3. Select your preferred language (English or Ukrainian)
+4. Enter your Google Gemini API key
+5. Upload two shelf photos (before and after)
+6. Click "Compare Photos"
+7. View results with red heatmap showing missing items
+8. Export results in your preferred format (HTML, JSON, CSV, or TXT)
 
 ## 🛠️ Debugging
 
