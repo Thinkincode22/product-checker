@@ -6,11 +6,13 @@ import { exportAsHTML, exportAsJSON, exportAsCSV, exportAsText, getExportFormats
 const ExportModal = ({ isOpen, onClose, result, image1, image2 }) => {
   const [selectedFormat, setSelectedFormat] = useState('html');
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(null);
 
   if (!isOpen) return null;
 
   const handleExport = () => {
     setExporting(true);
+    setExportError(null);
     
     try {
       switch (selectedFormat) {
@@ -37,7 +39,7 @@ const ExportModal = ({ isOpen, onClose, result, image1, image2 }) => {
       }, 500);
     } catch (error) {
       console.error('[Export] Error:', error);
-      alert('Failed to export results. Please try again.');
+      setExportError('Failed to export results. Please try again.');
       setExporting(false);
     }
   };
@@ -97,6 +99,12 @@ const ExportModal = ({ isOpen, onClose, result, image1, image2 }) => {
             </button>
           ))}
         </div>
+
+        {exportError && (
+          <div className="mt-4 bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">
+            {exportError}
+          </div>
+        )}
 
         <div className="flex gap-3">
           <button

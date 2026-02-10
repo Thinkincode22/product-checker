@@ -115,7 +115,13 @@ const APIKeyModal = ({ isOpen, onClose, onSave }) => {
                 <p className="text-sm text-gray-600 mb-4">
                     {t('enterApiKey')}
                     <br />
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                    <a 
+                        href="https://aistudio.google.com/app/apikey" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-500 underline"
+                        aria-label="Get a free API key (opens in new tab)"
+                    >
                         {t('getFreeKey')}
                     </a>.
                 </p>

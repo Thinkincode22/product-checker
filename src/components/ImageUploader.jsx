@@ -33,6 +33,8 @@ const ImageUploader = ({ label, onImageSelect, selectedImage }) => {
                     onImageSelect(compressed);
                 } catch (err) {
                     console.error('[ImageUploader] Compression failed:', err);
+                    // Inform user about fallback to original
+                    console.warn('[ImageUploader] Using original image without compression');
                     // Fall back to original if compression fails
                     onImageSelect(reader.result);
                 } finally {

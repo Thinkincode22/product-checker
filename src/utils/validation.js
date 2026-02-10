@@ -69,11 +69,12 @@ export function formatFileSize(bytes) {
 
 /**
  * Compress image if needed
+ * Note: Always converts to JPEG format, which may lose transparency from PNG/WebP
  * @param {string} base64 - Base64 image string
  * @param {number} maxWidth - Maximum width (default: 1920)
  * @param {number} maxHeight - Maximum height (default: 1920)
  * @param {number} quality - Compression quality 0-1 (default: 0.85)
- * @returns {Promise<string>} - Compressed base64 image
+ * @returns {Promise<string>} - Compressed base64 image (JPEG format)
  */
 export function compressImage(base64, maxWidth = 1920, maxHeight = 1920, quality = 0.85) {
   return new Promise((resolve, reject) => {

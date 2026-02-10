@@ -122,10 +122,12 @@ const translations = {
 
 /**
  * Get current language from localStorage or default to English
+ * Validates that the saved language exists in translations
  */
 export function getLanguage() {
   const saved = localStorage.getItem('app_language');
-  return saved || 'en';
+  // Validate that the saved language exists, otherwise default to English
+  return (saved && translations[saved]) ? saved : 'en';
 }
 
 /**

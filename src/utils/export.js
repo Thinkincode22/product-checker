@@ -14,6 +14,15 @@ export function exportAsJSON(result, filename = 'product-check-results.json') {
 }
 
 /**
+ * Format box coordinates as string
+ * @param {Array} box - Box coordinates [x1, y1, x2, y2]
+ * @returns {string} - Formatted coordinates
+ */
+function formatBoxCoordinates(box) {
+  return box ? `${box[0]} ${box[1]} ${box[2]} ${box[3]}` : 'N/A';
+}
+
+/**
  * Export results as CSV file
  * @param {Object} result - Analysis result
  * @param {string} filename - Optional filename
@@ -29,7 +38,7 @@ export function exportAsCSV(result, filename = 'product-check-results.csv') {
 
   // Add missing items
   result.missing.forEach(item => {
-    const box = item.box ? `${item.box[0]} ${item.box[1]} ${item.box[2]} ${item.box[3]}` : 'N/A';
+    const box = formatBoxCoordinates(item.box);
     csv += `"${item.label}",Missing,"${box}"\n`;
   });
 
@@ -60,8 +69,9 @@ export function exportAsText(result, filename = 'product-check-results.txt') {
     
     result.missing.forEach((item, idx) => {
       text += `${idx + 1}. ${item.label}\n`;
-      if (item.box) {
-        text += `   Location: [${item.box[0]}, ${item.box[1]}, ${item.box[2]}, ${item.box[3]}]\n`;
+      const box = formatBoxCoordinates(item.box);
+      if (box !== 'N/A') {
+        text += `   Location: [${box.replace(/ /g, ', ')}]\n`;
       }
       text += '\n';
     });
