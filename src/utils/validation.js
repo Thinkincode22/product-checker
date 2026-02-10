@@ -69,7 +69,19 @@ export function formatFileSize(bytes) {
 
 /**
  * Compress image if needed
- * Note: Always converts to JPEG format, which may lose transparency from PNG/WebP
+ * Note: Always converts to JPEG format for optimal compression.
+ * This is an intentional design decision to reduce API costs and improve performance.
+ * Transparency from PNG/WebP images will be lost (converted to white background).
+ * 
+ * Use cases where this may be problematic:
+ * - Images with transparent backgrounds for overlays
+ * - PNG images where transparency is essential
+ * 
+ * If transparency is required, consider:
+ * - Disabling compression for specific use cases
+ * - Using PNG compression instead (add separate function)
+ * - Pre-processing images before upload
+ * 
  * @param {string} base64 - Base64 image string
  * @param {number} maxWidth - Maximum width (default: 1920)
  * @param {number} maxHeight - Maximum height (default: 1920)

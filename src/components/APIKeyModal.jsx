@@ -78,9 +78,14 @@ const APIKeyModal = ({ isOpen, onClose, onSave }) => {
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div 
+                className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl max-h-[90vh] overflow-y-auto"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="settings-modal-title"
+            >
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <h2 id="settings-modal-title" className="text-xl font-bold text-gray-800 flex items-center gap-2">
                         <Settings size={20} />
                         {t('settingsTitle')}
                     </h2>

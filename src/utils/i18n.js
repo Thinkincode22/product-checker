@@ -150,9 +150,10 @@ export function t(key, params = {}) {
   const lang = getLanguage();
   let translation = translations[lang]?.[key] || translations.en[key] || key;
   
-  // Simple parameter interpolation
+  // Parameter interpolation - replace all occurrences
   Object.keys(params).forEach(param => {
-    translation = translation.replace(`{${param}}`, params[param]);
+    const regex = new RegExp(`\\{${param}\\}`, 'g');
+    translation = translation.replace(regex, params[param]);
   });
   
   return translation;
